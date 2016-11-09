@@ -23,10 +23,10 @@ make "${MAKEOPTS[@]}" nconfig
 make "${MAKEOPTS[@]}"
 make "${MAKEOPTS[@]}" modules_prepare
 
-if [ $BOOT = 1 ]; then mount /boot; fi
+if [ $BOOT -eq 1 ]; then mount /boot; fi
 make "${MAKEOPTS[@]}" install
 make "${MAKEOPTS[@]}" modules_install
 genkernel --lvm initramfs
 grub-mkconfig -o /boot/grub/grub.cfg
-if [ $BOOT = 1 ]; then umount /boot; fi
+if [ $BOOT -eq 1 ]; then umount /boot; fi
 
