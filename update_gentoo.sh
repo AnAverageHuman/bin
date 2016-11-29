@@ -10,15 +10,14 @@ if [[ $(id -u) -ne 0 ]]; then
     exit 1
 fi
 
-emaint sync --auto
-eix-update --quiet
+eix-sync
 
 emerge "${OPTIONS[@]}" ${JOBS} --quiet-build --update --deep --with-bdeps=y --newuse @world
 emerge "${OPTIONS[@]}" ${JOBS} --oneshot @preserved-rebuild
 emerge "${OPTIONS[@]}" ${JOBS} --depclean
 
 revdep-rebuild
-emaint all
-emaint logs
+emaint all --fix
+emaint logs --clean
 wait
 
