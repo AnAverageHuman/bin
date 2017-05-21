@@ -8,17 +8,14 @@ if [[ $(id -u) -ne 0 ]]; then
 fi
 
 MAKEOPTS=("-j4")
-CWD=$(pwd)
 
-BOOT=
+BOOT=0
 mountpoint /boot || BOOT=1
 
-back() {
-    cd "$CWD"
-}
-trap back EXIT
+pushd /usr/src/linux > /dev/null || exit
+trap 'popd>/dev/null' EXIT
 
-cd /usr/src/linux || exit
+make "${MAKEOPTS[@]}" silentoldconfig
 make "${MAKEOPTS[@]}" nconfig
 make "${MAKEOPTS[@]}"
 make "${MAKEOPTS[@]}" modules_prepare
