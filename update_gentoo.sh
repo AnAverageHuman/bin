@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-OPTIONS=('--ask' '--keep-going' '--backtrack=10000' '--verbose-conflicts')
+OPTIONS=('--ask' '--alert' '--keep-going' '--backtrack=10000' '--verbose-conflicts' '--binpkg-respect-use' '--binpkg-changed-deps')
 JOBS=1
 
 
@@ -12,7 +12,7 @@ fi
 
 eix-sync -q
 
-emerge "${OPTIONS[@]}" --jobs=${JOBS:-1} "$@" --complete-graph --deep --newuse --quiet-build --quiet-fail --tree --unordered-display --update --usepkg --with-bdeps=y @world
+emerge "${OPTIONS[@]}" --jobs=${JOBS:-1} "$@" --complete-graph --deep --newuse --quiet-build --quiet-fail --update --usepkg --with-bdeps=y @world
 emerge "${OPTIONS[@]}" --jobs=${JOBS:-1} --depclean
 emerge "${OPTIONS[@]}" --jobs=${JOBS:-1} --quiet-build --oneshot @preserved-rebuild
 
