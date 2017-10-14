@@ -39,7 +39,7 @@ EOF
 
 tmux new-session -d -t "${TMUX_SESSION}"
 tmux send-keys "mopidy" C-m
-tmux split-window -v -p 75 "ncmpcpp"
+tmux split-window -v -p 75 "while true; do ncmpcpp; done"
 tmux select-pane -t 1
 tmux split-window -h -p 60 "$process"
 tmux select-pane -t 2
