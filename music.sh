@@ -13,8 +13,11 @@ cleanup() {
 trap cleanup TERM
 trap '' INT
 
+until mpc random on > /dev/null 2>&1; do
+    sleep 1
+done
+
 clear
-mpc random on
 mpc consume on
 while true; do
     read -rp 'mpc> ' cmd
@@ -36,7 +39,6 @@ EOF
 
 tmux new-session -d -t "${TMUX_SESSION}"
 tmux send-keys "mopidy" C-m
-sleep 10
 tmux split-window -v -p 75 "ncmpcpp"
 tmux select-pane -t 1
 tmux split-window -h -p 60 "$process"
