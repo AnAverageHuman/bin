@@ -37,11 +37,8 @@ done
 EOF
 
 
-tmux new-session -d -t "${TMUX_SESSION}"
-tmux send-keys "mopidy" C-m
-tmux split-window -v -p 75 "while true; do ncmpcpp; done"
-tmux select-pane -t 1
-tmux split-window -h -p 60 "$process"
-tmux select-pane -t 2
-tmux attach-session -t "${TMUX_SESSION}"
+tmux new-session -d -s "${TMUX_SESSION}" 'mopidy'
+tmux split-window -t "${TMUX_SESSION}:1.1" -v -p 75 "while true; do ncmpcpp; done"
+tmux split-window -t "${TMUX_SESSION}:1.1" -h -p 60 "$process"
+tmux attach-session -t "${TMUX_SESSION}:1.2"
 
