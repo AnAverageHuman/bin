@@ -45,5 +45,10 @@ EOF
 tmux new-session -d -s "${TMUX_SESSION}" 'mopidy'
 tmux split-window -t "${TMUX_SESSION}:1.1" -v -p 75 "while true; do ncmpcpp; done"
 tmux split-window -t "${TMUX_SESSION}:1.1" -h -p 60 "$process"
-tmux attach-session -t "${TMUX_SESSION}:1.2"
+
+if [ -z "${TMUX+x}" ]; then
+    tmux attach-session -t "${TMUX_SESSION}:1.2"
+else
+    echo "Started in background."
+fi
 
