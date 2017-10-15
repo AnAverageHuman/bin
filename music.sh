@@ -3,6 +3,11 @@ set -euo pipefail
 
 TMUX_SESSION=music
 
+if tmux has-session -t music; then
+    tmux attach-session -t music
+    exit
+fi
+
 read -rd '' process << 'EOF' || true
 cleanup() {
     killall ncmpcpp
