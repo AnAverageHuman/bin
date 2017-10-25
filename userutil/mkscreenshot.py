@@ -8,14 +8,14 @@ TMPDIR = "/tmp/"
 OUTNAME = TMPDIR + str(int(time())) + '.png'
 
 p = ArgumentParser(description="Takes a screenshot using maim.")
-p.add_argument('--select', '-s', action='store_const', const='--select')
+p.add_argument('--select', '-s', action='store_true')
 args = p.parse_args()
 
 f = NamedTemporaryFile()
-command = ['maim', '--format=png']
+command = ['maim', '--format=png', '--hidecursor']
 
 if args.select:
-    command.append(args.select)
+    command.append('--select')
 
 call(command + [f.name])
 call(['pngcrush', '-rem alla', '-reduce', f.name, OUTNAME])
