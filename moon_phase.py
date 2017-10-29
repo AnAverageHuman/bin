@@ -11,6 +11,6 @@ for i in ['new', 'full', 'first quarter', 'last quarter']:
 
 for k, v in sorted(m.items(), key=lambda x: x[1]):
     if v == d:
-        print("{} moon tonight!".format(k.title()))
+        print("{} moon tonight!".format(k.capitalize()))
     else:
         print("Next {} moon: {}".format(k, v))
