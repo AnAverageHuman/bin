@@ -30,6 +30,9 @@ while true; do
         exit)
             cleanup
             ;;
+        p)
+            mpc toggle
+            ;;
         pauseafter)
             sleep "$(mpc | awk -F"[ /:]" '/playing/ {print 60*($8-$6)+$9-$7}')"
             mpc pause
