@@ -12,9 +12,9 @@ fi
 
 eix-sync -q
 
-emerge "${OPTIONS[@]}" --jobs=${JOBS:-1} "$@" --complete-graph --deep --newuse --update --usepkg --with-bdeps=y @world
-emerge "${OPTIONS[@]}" --jobs=${JOBS:-1} --depclean
-emerge "${OPTIONS[@]}" --jobs=${JOBS:-1} --oneshot @preserved-rebuild
+nice emerge "${OPTIONS[@]}" --jobs=${JOBS:-1} "$@" --complete-graph --deep --newuse --update --usepkg --with-bdeps=y @world
+nice emerge "${OPTIONS[@]}" --jobs=${JOBS:-1} --depclean
+nice emerge "${OPTIONS[@]}" --jobs=${JOBS:-1} --oneshot @preserved-rebuild
 
 revdep-rebuild
 emaint all --fix
