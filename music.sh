@@ -3,7 +3,7 @@ set -euo pipefail
 
 TMUX_SESSION=music
 
-if tmux has-session -t music; then
+if tmux has-session -t music 2> /dev/null; then
     tmux attach-session -t music
     exit
 fi
