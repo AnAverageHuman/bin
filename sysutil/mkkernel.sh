@@ -15,6 +15,7 @@ pushd /usr/src/linux > /dev/null || exit
 
 function cleanup {
     popd > /dev/null
+    [ $BOOT -eq 1 ] && umount /boot
 }
 
 trap cleanup INT TERM
@@ -24,12 +25,11 @@ make "${MAKEOPTS[@]}" nconfig
 make "${MAKEOPTS[@]}"
 #make "${MAKEOPTS[@]}" modules_prepare
 
-if [ $BOOT -eq 1 ]; then mount /boot; fi
+[ $BOOT -eq 1 ] && mount /boot
 make "${MAKEOPTS[@]}" install
 #make "${MAKEOPTS[@]}" modules_install
 genkernel --lvm initramfs
 grub-mkconfig -o /boot/grub/grub.cfg
-if [ $BOOT -eq 1 ]; then umount /boot; fi
 
 cleanup
 
