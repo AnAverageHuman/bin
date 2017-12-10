@@ -16,7 +16,7 @@ nice emerge "${OPTIONS[@]}" --jobs=${JOBS:-1} "$@" --complete-graph --deep --new
 nice emerge "${OPTIONS[@]}" --jobs=${JOBS:-1} --depclean
 nice emerge "${OPTIONS[@]}" --jobs=${JOBS:-1} --oneshot @preserved-rebuild
 
-revdep-rebuild
+revdep-rebuild --quiet
 emaint all --fix
 emaint logs --clean
 eclean-dist --deep --time-limit=1m --quiet
