@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 TMPFILE="$(mktemp)"
 OUTFILE="${TMPFILE%/*}/$(date +%s).png"
 
@@ -7,8 +7,8 @@ finish() {
 }
 trap finish EXIT
 
-MAIM=(maim --format=png --hidecursor $TMPFILE)
-CRUSH=(pngcrush -rem alla -reduce $TMPFILE $OUTFILE)
+MAIM=(maim '--format=png' --hidecursor "$TMPFILE")
+CRUSH=(pngcrush -rem alla -reduce "$TMPFILE" "$OUTFILE")
 
 while [[ $# -gt 0 ]]; do
     key="$1"
