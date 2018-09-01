@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# A clearsigned text "editor".
+# Easily edit and re-sign the body of an embedded PGP clearsigned document.
+#
+# Usage:
+# clearsigned [-b] file ...
+
+SHORTOPT=b
+LONGOPTS=backup
+
+! PARSED=$(getopt --options=${SHORTOPT} --longoptions=${LONGOPTS} --name "$0" -- "$@")
+[[ ${PIPESTATUS[0]} -ne 0 ]] && exit 2
+eval set -- "$PARSED"
+
+while true; do
+    case $1 in
+        -b|--backup)
+            backup=1
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "Error while parsing arguments" >&2
+            exit 2
+    esac
+done
+
+if [[ $# -lt 1 ]]; then
+    echo "Expected at least one file to process" >&2
+    exit 3
+fi
+
+myhead='^-----BEGIN PGP SIGNED MESSAGE-----$'
+mytail='^-----END PGP SIGNATURE-----$'
+
+for file in "$@"; do
+    [ -z ${backup+x} ] || cp "${file}" "${file}.bak"
+    tmpfile=$(mktemp)
+    # TODO: this answers yes to all gpg questions, but mktemp --dry-run unsafe?
+    gpg -o "$tmpfile" --yes --skip-verify --decrypt "$file" 2> /dev/null
+
+    echo "Editing the contents of $file..."
+    $EDITOR "$tmpfile"
+
+    tmpfile2=$(mktemp)
+    gpg -o "$tmpfile2" --yes --clearsign "$tmpfile"
+    rm "$tmpfile"
+    sed -i '1,1d; $d' "${tmpfile2}"
+
+    sed -ne "/${myhead}/ {p; r ${tmpfile2}" \
+        -e ":a; n; /${mytail}/ {p; b}; ba}; p" -i "$file"
+    rm "$tmpfile2"
+done
+
