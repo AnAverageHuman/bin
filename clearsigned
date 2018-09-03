@@ -39,15 +39,23 @@ myhead='^-----BEGIN PGP SIGNED MESSAGE-----$'
 mytail='^-----END PGP SIGNATURE-----$'
 
 for file in "$@"; do
-    [ -z ${backup+x} ] || cp "${file}" "${file}.bak"
+    printf "%s: " "$file"
+
+    if [ -v backup ]; then
+        cp "${file}" "${file}.bak"
+        printf "backed up. "
+    fi
+
     tmpfile=$(mktemp --dry-run)
     [ -f $file ] && gpg -o "$tmpfile" --skip-verify --decrypt "$file" 2> /dev/null
+    printf "extracted. "
 
-    echo "Editing the contents of $file..."
     $EDITOR "$tmpfile"
+    printf "edited. "
 
     tmpfile2=$(mktemp --dry-run)
     gpg -o "$tmpfile2" --clearsign "$tmpfile"
+    printf "signed. "
     rm "$tmpfile"
 
     if [ -f $file ]; then
@@ -58,5 +66,6 @@ for file in "$@"; do
     else
         mv "$tmpfile2" "$file"
     fi
+    printf "done.\\n"
 done
 
