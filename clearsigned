@@ -40,20 +40,23 @@ mytail='^-----END PGP SIGNATURE-----$'
 
 for file in "$@"; do
     [ -z ${backup+x} ] || cp "${file}" "${file}.bak"
-    tmpfile=$(mktemp)
-    # TODO: this answers yes to all gpg questions, but mktemp --dry-run unsafe?
-    gpg -o "$tmpfile" --yes --skip-verify --decrypt "$file" 2> /dev/null
+    tmpfile=$(mktemp --dry-run)
+    [ -f $file ] && gpg -o "$tmpfile" --skip-verify --decrypt "$file" 2> /dev/null
 
     echo "Editing the contents of $file..."
     $EDITOR "$tmpfile"
 
-    tmpfile2=$(mktemp)
-    gpg -o "$tmpfile2" --yes --clearsign "$tmpfile"
+    tmpfile2=$(mktemp --dry-run)
+    gpg -o "$tmpfile2" --clearsign "$tmpfile"
     rm "$tmpfile"
-    sed -i '1,1d; $d' "${tmpfile2}"
 
-    sed -ne "/${myhead}/ {p; r ${tmpfile2}" \
-        -e ":a; n; /${mytail}/ {p; b}; ba}; p" -i "$file"
-    rm "$tmpfile2"
+    if [ -f $file ]; then
+        sed -i '1,1d; $d' "${tmpfile2}"
+        sed -ne "/${myhead}/ {p; r ${tmpfile2}" \
+            -e ":a; n; /${mytail}/ {p; b}; ba}; p" -i "$file"
+        rm "$tmpfile2"
+    else
+        mv "$tmpfile2" "$file"
+    fi
 done
 
