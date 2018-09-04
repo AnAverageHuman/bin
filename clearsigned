@@ -51,7 +51,11 @@ for file in "$@"; do
     fi
 
     tmpfile=$(mktemp --dry-run)
-    [ -f $file ] && gpg -o "$tmpfile" --skip-verify --decrypt "$file" 2> /dev/null
+    if [ -f $file ] && ! output=$(gpg -o "$tmpfile" --decrypt "$file" 2>&1 >/dev/null); then
+        echo "$output" >&2
+        rm "$tmpfile" 2>/dev/null
+        exit 1
+    fi
     printf "extracted. "
 
     ${editor:-${EDITOR}} "$tmpfile"
