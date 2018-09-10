@@ -5,15 +5,16 @@ set -euo pipefail
 # Easily edit and re-sign the body of an embedded PGP clearsigned document.
 #
 # Usage:
-# clearsigned [-b] [-e editor] file ...
+# clearsigned [-b] [-s] [-e editor] file ...
 
 SHORTOPT=be:
-LONGOPTS=backup,editor:
+LONGOPTS=backup,editor:,skip-verify
 
 ! PARSED=$(getopt --options=${SHORTOPT} --longoptions=${LONGOPTS} --name "$0" -- "$@")
 [[ ${PIPESTATUS[0]} -ne 0 ]] && exit 2
 eval set -- "$PARSED"
 
+skip_verify=
 while true; do
     case $1 in
         -b|--backup)
@@ -23,6 +24,10 @@ while true; do
         -e|--editor)
             editor=$2
             shift 2
+            ;;
+        --skip-verify)
+            skip_verify="--skip-verify"
+            shift
             ;;
         --)
             shift
@@ -51,7 +56,8 @@ for file in "$@"; do
     fi
 
     tmpfile=$(mktemp --dry-run).${file##*.}
-    if [ -f $file ] && ! output=$(gpg -o "$tmpfile" --decrypt "$file" 2>&1 >/dev/null); then
+    [ -z ${skip_verify} ] || printf "skipping verification! "
+    if [ -f $file ] && ! output=$(gpg -o "$tmpfile" --decrypt ${skip_verify} "$file" 2>&1 >/dev/null); then
         echo "$output" >&2
         rm "$tmpfile" 2>/dev/null
         exit 1
