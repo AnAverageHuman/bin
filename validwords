@@ -1,0 +1,90 @@
+#!/usr/bin/env julia
+
+# Finds all the valid words that can be created with a list of letters.
+#
+# Usage:
+#   ./validwords [dict ...]
+#
+# At the "chars> " prompt:
+#   Enter a string of letters. "asdf" is processed the same as "a s d f".
+#
+
+const DICTIONARY = ["/usr/share/dict/words"]
+
+module ValidWords
+using REPL
+using REPL.LineEdit
+
+const PROMPT = "chars> "
+
+# lookup table: countmap -> set of words
+function gen_lookup(dictionaries::AbstractArray)
+    dictcount = Dict{Dict{Char,Int8},Set{String}}()
+
+    for file in dictionaries
+        for line in eachline(file)
+            all(isletter, line) || continue
+            letters = Dict{Char,Int8}()
+
+            for c in line
+                letters[c] = get(letters, c, 0) + 1
+            end
+            push!(get!(dictcount, letters, Set()), line)
+        end
+    end
+
+    dictcount
+end
+
+function getwords!(letters::Vector{Char}, dictcount::Dict{Dict{Char,Int8},Set{String}})
+    want = Dict{Char,Int8}()
+
+    for c in letters
+        c = lowercase(c)
+        want[c] = get(want, c, 0) + 1
+    end
+
+    goodwords = Set{String}()
+    for (letters, words) in dictcount
+        # tuples of letter, count
+        all(lc -> lc[2] <= get(want, lc[1], 0), letters) && union!(goodwords, words)
+    end
+
+    goodwords
+end
+
+# create the REPL
+function main(dicts)
+    t = REPL.Terminals.TTYTerminal("xterm", stdin, stdout, stderr)
+    repl = REPL.LineEditREPL(t, false)
+    prompt = REPL.LineEdit.Prompt(PROMPT)
+
+    dictcount = gen_lookup(dicts)
+    println("Generated lookup table with $(length(dictcount)) words")
+
+    prompt.on_done = (s, buf, ok) -> begin
+        ok || exit()
+
+        try
+            goodwords = getwords!(buf |> take! |> String |> Vector{Char}, dictcount)
+            for i in goodwords
+                println(i)
+            end
+        catch err
+            REPL.print_response(repl, err, catch_backtrace(), true, Base.have_color)
+        end
+        REPL.reset(repl)
+        REPL.prepare_next(repl)
+        REPL.reset_state(s)
+    end
+
+    REPL.run_interface(t, REPL.LineEdit.ModalInterface([prompt]))
+end
+end
+
+isinteractive() || begin
+    dictionaries = length(ARGS) > 0 ? ARGS : DICTIONARY
+    ValidWords.main(dictionaries)
+end
+
+# vim: ft=julia
