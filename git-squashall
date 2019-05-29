@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+# compresses all history into a single commit
+
+git filter-branch --force --parent-filter true -- @^!
