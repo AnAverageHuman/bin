@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+
+# Simple tool for browsing cht.sh
+#   Usage: ./how lang [query]
+
+where=$1
+shift
+
+IFS=+ curl "https://cht.sh/$where/$*"
