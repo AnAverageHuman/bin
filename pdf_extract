@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+# Usage:
+# pdf_extract file firstpage lastpage [outname]
+
+gs -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -dFirstPage=$2 -dLastPage=$3 \
+    -sOutputFile=${4:-out.pdf} $1
