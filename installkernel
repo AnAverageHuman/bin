@@ -1,0 +1,31 @@
+#!/bin/sh
+# Adapted from Debian's installkernel
+set -e
+
+if [ $# -ge 3 ] && [ $# -le 5 ]; then
+    ver=$1
+    img=$2
+    map=$3
+    if [ $# -ge 4 ] && [ -n "$4" ]; then
+        dir=$4
+    else
+        dir="/boot"
+    fi
+else
+    echo 'Usage: installkernel <version> <image> <System.map> <directory>'
+    exit 1
+fi
+
+if [ "$(basename "$img")" = 'vmlinux' ]; then
+    img_dest=vmlinux
+else
+    img_dest=vmlinuz
+fi
+
+updatever() {
+    cat "$2" > "$dir/$1-$ver"
+}
+
+updatever $img_dest "$img"
+updatever System.map "$map"
+updatever config "$(dirname "$map")/.config"
